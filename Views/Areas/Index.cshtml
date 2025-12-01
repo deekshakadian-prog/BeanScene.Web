@@ -1,35 +1,124 @@
 ﻿@model IEnumerable<BeanScene.Web.Models.Area>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Areas";
+    var areas = Model.OrderBy(a => a.AreaId).ToList();
 }
 
-<h1>Index</h1>
+<style>
+    .areas-strip {
+        display: flex;
+        justify-content: center;
+        gap: 2.5rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
 
-<p>
-    <a asp-action="Create">Create New</a>
+    .area-node {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .area-box {
+        min-width: 160px;
+        padding: 1rem 1.4rem;
+        border-radius: 12px;
+        border: 2px solid #0d6efd;
+        background: #f8f9ff;
+        text-align: center;
+        font-weight: 600;
+        text-decoration: none;
+        color: #0d6efd;
+        box-shadow: 0 2px 6px rgba(0,0,0,.08);
+        transition: background .2s ease, color .2s ease, transform .15s ease;
+    }
+
+        .area-box:hover {
+            background: #0d6efd;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+    .area-arrow {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid #6c757d;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        text-decoration: none;
+        color: #6c757d;
+        background: #ffffff;
+        transition: color .15s ease, border-color .15s ease, transform .15s ease;
+    }
+
+        .area-arrow:hover {
+            color: #0d6efd;
+            border-color: #0d6efd;
+            transform: translateY(-1px);
+        }
+
+        .area-arrow.disabled {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+</style>
+
+<h2 class="mb-3">Restaurant Areas</h2>
+<p class="text-muted">
+    Each area sits in a doubly linked list. Use the left / right arrows to move
+    to the previous or next area, or click the box to open that area’s details.
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.AreaName)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AreaName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.AreaId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.AreaId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.AreaId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+
+<div class="areas-strip">
+    @for (int i = 0; i < areas.Count; i++)
+    {
+        var current = areas[i];
+        var hasPrev = i > 0;
+        var hasNext = i < areas.Count - 1;
+        var prev = hasPrev ? areas[i - 1] : null;
+        var next = hasNext ? areas[i + 1] : null;
+
+        <div class="area-node">
+            <!-- PREVIOUS arrow -->
+            @if (hasPrev)
+            {
+                <a asp-action="Details"
+                   asp-route-id="@prev!.AreaId"
+                   class="area-arrow"
+                   title="Go to @prev.AreaName">
+                    ←
+                </a>
+            }
+            else
+            {
+                <span class="area-arrow disabled">←</span>
+            }
+
+            <!-- CURRENT area box -->
+            <a asp-action="Details"
+               asp-route-id="@current.AreaId"
+               class="area-box">
+                @current.AreaName
+            </a>
+
+            <!-- NEXT arrow -->
+            @if (hasNext)
+            {
+                <a asp-action="Details"
+                   asp-route-id="@next!.AreaId"
+                   class="area-arrow"
+                   title="Go to @next.AreaName">
+                    →
+                </a>
+            }
+            else
+            {
+                <span class="area-arrow disabled">→</span>
+            }
+        </div>
+    }
+</div>

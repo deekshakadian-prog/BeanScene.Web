@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BeanScene.Web.Data;
+using BeanScene.Web.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using BeanScene.Web.Data;
-using BeanScene.Web.Models;
 
 namespace BeanScene.Web.Controllers
 {
+    [Authorize(Roles = "Admin,Staff")]
     public class AreasController : Controller
     {
         private readonly BeanSceneContext _context;
@@ -22,7 +21,22 @@ namespace BeanScene.Web.Controllers
         // GET: Areas
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Areas.ToListAsync());
+            // 1️⃣ Load all areas in a stable order (e.g. by AreaId)
+            var areas = await _context.Areas
+                .OrderBy(a => a.AreaId)
+                .ToListAsync();
+
+            // 2️⃣ Build an in-memory doubly linked list
+            for (int i = 0; i < areas.Count; i++)
+            {
+                areas[i].PreviousArea = (i > 0) ? areas[i - 1] : null;
+                areas[i].NextArea = (i < areas.Count - 1) ? areas[i + 1] : null;
+            }
+
+            // 3️⃣ Pass this list to the view – you can use
+            //     Model[i].PreviousArea / Model[i].NextArea
+            //     to draw arrows / navigation buttons.
+            return View(areas);
         }
 
         // GET: Areas/Details/5
@@ -50,8 +64,6 @@ namespace BeanScene.Web.Controllers
         }
 
         // POST: Areas/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AreaId,AreaName")] Area area)
@@ -82,8 +94,6 @@ namespace BeanScene.Web.Controllers
         }
 
         // POST: Areas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("AreaId,AreaName")] Area area)

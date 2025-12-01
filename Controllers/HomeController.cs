@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using BeanScene.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BeanScene.Web.Controllers
 {

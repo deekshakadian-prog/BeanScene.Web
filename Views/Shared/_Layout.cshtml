@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<BeanScene.Web.Data.ApplicationUser> SignInManager
-@inject UserManager<BeanScene.Web.Data.ApplicationUser> UserManager
+@using BeanScene.Web.Data
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,79 +17,110 @@
         <nav class="navbar navbar-expand-sm navbar-light bg-light border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand fw-bold text-primary" asp-area="" asp-controller="Home" asp-action="Index">
-                    ☕ BeanScene Café
+                    BeanScene
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false"
+                        aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
+                    <!-- LEFT SIDE NAV -->
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-                        <!-- 🏠 Main navigation -->
+                        <!-- Always visible -->
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                            <a class="nav-link text-dark"
+                               asp-area="" asp-controller="Home" asp-action="Index">
                                 Home
                             </a>
                         </li>
-                        <!--
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">
-                                Privacy
-                            </a>
-                        </li>
-                        -->
 
-                        <!-- 🍽 Add your app pages -->
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Reservations" asp-action="Index">
-                                Reservations
-                            </a>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="DashBoards" asp-action="Index">
-                                DashBoard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="SittingSchedules" asp-action="Index">
-                                Sitting Schedules
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Areas" asp-action="Index">
-                                Areas
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="RestaurantTables" asp-action="Index">
-                            Tables
-                        </a>
-                        </li>
-                        @if (User.IsInRole("Admin"))
+                        @if (SignInManager.IsSignedIn(User))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Users">
-                                    Manage Users
-                                </a>
-                            </li>
+                            if (User.IsInRole("Admin") || User.IsInRole("Staff"))
+                            {
+                                <!-- Admin / Staff menu -->
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark"
+                                    asp-area="" asp-controller="AdminReservations" asp-action="Index">
+                                        Reservations
+                                    </a>
+                                </li>
+                               
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark"
+                                    asp-area="" asp-controller="RestaurantTables" asp-action="Index">
+                                        Tables
+                                    </a>
+                                </li>
+                               
+                                if (User.IsInRole("Admin"))
+                                            {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark"
+                                           asp-area="" asp-controller="SittingSchedules" asp-action="Index">
+                                            Sitting Schedules
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark"
+                                           asp-area="" asp-controller="Areas" asp-action="Index">
+                                            Areas
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark"
+                                        asp-area="" asp-controller="Dashboards" asp-action="Index">
+                                            Dashboard
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark"
+                                        asp-area="" asp-controller="Admin" asp-action="Users">
+                                            Manage Users
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            else if (User.IsInRole("Member"))
+                            {
+                                <!-- Member menu -->
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark"
+                                    asp-area="" asp-controller="MemberReservations" asp-action="Book">
+                                        Book a Table
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark"
+                                    asp-area="" asp-controller="MemberReservations" asp-action="MyReservations">
+                                        My Reservations
+                                    </a>
+                                </li>
+                            }
                         }
-
                     </ul>
 
-                    <!-- 👤 Right-side Login/Register or Logout -->
+                    <!-- RIGHT SIDE AUTH AREA -->
                     <ul class="navbar-nav">
                         @if (SignInManager.IsSignedIn(User))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                                    Hello, @User.Identity!.Name
-                                </a>
+                                <span class="navbar-text me-2">
+                                    Hello, @User.Identity?.Name
+                                </span>
                             </li>
                             <li class="nav-item">
-                                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout"
-                                      asp-route-returnUrl="@Url.Action("Index","Home")" method="post">
-                                    <button type="submit" class="nav-link btn btn-link text-dark">
+                                <form class="form-inline"
+                                      asp-area="Identity"
+                                      asp-page="/Account/Logout"
+                                      asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
+                                      method="post">
+                                    <button type="submit"
+                                            class="nav-link btn btn-link text-dark">
                                         Logout
                                     </button>
                                 </form>
@@ -97,12 +129,14 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">
+                                <a class="nav-link text-dark"
+                                   asp-area="Identity" asp-page="/Account/Login">
                                     Login
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">
+                                <a class="nav-link text-dark"
+                                   asp-area="Identity" asp-page="/Account/Register">
                                     Register
                                 </a>
                             </li>
@@ -118,22 +152,16 @@
             @RenderBody()
         </main>
     </div>
-    <!--
-    <footer class="border-top footer text-muted text-center py-3">
-        <div class="container">
-            &copy; @DateTime.Now.Year - BeanScene Café
-        </div>
-    </footer>
-    -->
+
     <footer class="border-top footer text-muted text-center py-3">
         <div class="container">
             <p class="mb-1">&copy; @DateTime.Now.Year - BeanScene Café</p>
-            <a class="text-decoration-none text-muted" asp-area="" asp-controller="Home" asp-action="Privacy">
+            <a class="text-decoration-none text-muted"
+               asp-area="" asp-controller="Home" asp-action="Privacy">
                 Privacy Policy
             </a>
         </div>
     </footer>
-
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

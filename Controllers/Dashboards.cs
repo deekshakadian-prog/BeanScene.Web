@@ -1,66 +1,105 @@
-﻿using BeanScene.Web.ViewModels;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using BeanScene.Web.Data;
+using BeanScene.Web.Models;
+using BeanScene.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BeanScene.Web.Controllers
+
 {
+    [Authorize(Roles = "Admin")]
     public class Dashboards : Controller
     {
-        public IActionResult Index(DateTime? date)
+        private readonly BeanSceneContext _context;
+
+        public Dashboards(BeanSceneContext context)
         {
+            _context = context;
+        }
+
+        // GET: /Dashboards/Index?date=2025-11-28 (date is optional)
+        public async Task<IActionResult> Index(DateTime? date)
+        {
+            // If no date given, use today
             var targetDate = (date ?? DateTime.Today).Date;
 
-            // TODO: Replace this with real data from your DB (Reservations, Sittings, Tables, etc.)
-            var demoReservations = new List<ReservationListItemViewModel>
-            {
-                new ReservationListItemViewModel
-                {
-                    Id = 1,
-                    GuestName = "John Smith",
-                    Phone = "0400 000 000",
-                    Email = "john@example.com",
-                    SittingName = "Dinner",
-                    ReservationStart = targetDate.AddHours(18), // 6pm
-                    DurationMinutes = 90,
-                    NumberOfGuests = 3,
-                    Area = "Main",
-                    Tables = "M3",
-                    Status = "Pending",
-                    Source = "Phone",
-                    Notes = "Table by the window"
-                },
-                new ReservationListItemViewModel
-                {
-                    Id = 2,
-                    GuestName = "Sarah Lee",
-                    Phone = "0400 111 111",
-                    Email = "sarah@example.com",
-                    SittingName = "Dinner",
-                    ReservationStart = targetDate.AddHours(19), // 7pm
-                    DurationMinutes = 120,
-                    NumberOfGuests = 4,
-                    Area = "Balcony",
-                    Tables = "B1, B2",
-                    Status = "Confirmed",
-                    Source = "Online",
-                    Notes = "Highchair required"
-                }
-            };
+            // 1) Load real reservations for that date
+            var reservationsForDay = await _context.Reservations
+                .Include(r => r.Sitting)             // SittingSchedule nav (Stype, Scapacity, etc.)
+                .Include(r => r.RestaurantTables)    // tables for this reservation
+                    .ThenInclude(t => t.Area)        // area for each table
+                .Where(r => r.StartTime.Date == targetDate)
+                .ToListAsync();
 
+            // 2) Map to ReservationListItemViewModel (for the list on the dashboard)
+            var reservationItems = reservationsForDay
+                .Select(r => new ReservationListItemViewModel
+                {
+                    Id = r.ReservationId,
+                    GuestName = $"{r.FirstName} {r.LastName}",
+                    Phone = r.Phone,
+                    Email = r.Email,
+                    SittingName = r.Sitting != null ? r.Sitting.Stype : "",
+                    ReservationStart = r.StartTime,
+                    DurationMinutes = r.Duration,
+                    NumberOfGuests = r.NumOfGuests,
+                    Area = string.Join(", ",
+                        r.RestaurantTables
+                            .Where(t => t.Area != null)
+                            .Select(t => t.Area!.AreaName)
+                            .Distinct()
+                    ),
+                    Tables = string.Join(", ",
+                        r.RestaurantTables.Select(t => t.TableName)
+                    ),
+                    Status = r.Status,
+                    Source = r.ReservationSource,
+                    Notes = r.Notes
+                })
+                .ToList();
+
+            // 3) Work out total capacity for the day (sum of Scapacity for sittings used that day)
+            int totalCapacity = 0;
+
+            var sittingsForDay = reservationsForDay
+                .Where(r => r.Sitting != null)
+                .Select(r => r.Sitting!)
+                .Distinct();
+
+            if (sittingsForDay.Any())
+            {
+                totalCapacity = sittingsForDay.Sum(s => s.Scapacity);
+            }
+            else
+            {
+                // Fallback if no sittings found – you can adjust this
+                totalCapacity = 40;
+            }
+
+            // 4) Build dashboard summary
             var model = new ReservationDashboardViewModel
             {
                 Date = targetDate,
-                TotalReservations = demoReservations.Count,
-                PendingReservations = demoReservations.Count(r => r.Status == "Pending"),
-                ConfirmedReservations = demoReservations.Count(r => r.Status == "Confirmed"),
-                SeatedReservations = demoReservations.Count(r => r.Status == "Seated"),
-                CompletedReservations = demoReservations.Count(r => r.Status == "Completed"),
-                CancelledReservations = demoReservations.Count(r => r.Status == "Cancelled"),
-                TotalCapacity = 40, // e.g. dinner sitting capacity
-                GuestsBooked = demoReservations.Sum(r => r.NumberOfGuests),
-                Reservations = demoReservations
+
+                TotalReservations = reservationItems.Count,
+                PendingReservations = reservationItems.Count(r => r.Status == "Pending"),
+                ConfirmedReservations = reservationItems.Count(r => r.Status == "Confirmed"),
+                SeatedReservations = reservationItems.Count(r => r.Status == "Seated"),
+                CompletedReservations = reservationItems.Count(r => r.Status == "Completed"),
+                CancelledReservations = reservationItems.Count(r => r.Status == "Cancelled"),
+
+                TotalCapacity = totalCapacity,
+                GuestsBooked = reservationItems.Sum(r => r.NumberOfGuests),
+
+                Reservations = reservationItems
             };
 
             return View(model);
         }
     }
 }
+

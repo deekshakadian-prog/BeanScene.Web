@@ -30,6 +30,7 @@ public partial class Reservation
     [Range(15, 300)]
     public int Duration { get; set; }
 
+
     [Required, Range(1, 20), Display(Name = "Guests")]
     public int NumOfGuests { get; set; } = 2;
 
@@ -37,14 +38,19 @@ public partial class Reservation
     public string ReservationSource { get; set; } = "Online";
 
     public string? Notes { get; set; }
+    [StringLength(50)]
+    [Display(Name = "Table(s)")]
+    public string? TableNumber { get; set; }
 
- 
+
+
     public string Status { get; set; } = "Pending";
 
     // You won't post this from the form; set it in the controller
     public DateTime CreatedAt { get; set; }
 
     // IMPORTANT: navigation properties should not be validated on Create
-    [ValidateNever] public virtual SittingSchedule? Sitting { get; set; }  // make nullable
+    [ValidateNever] public virtual SittingSchedule? Sitting { get; set; }
+    // make nullable
     [ValidateNever] public virtual ICollection<RestaurantTable> RestaurantTables { get; set; } = new List<RestaurantTable>();
 }

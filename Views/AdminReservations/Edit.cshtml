@@ -1,0 +1,127 @@
+﻿@model BeanScene.Web.Models.Reservation
+
+@{
+    ViewData["Title"] = "Edit Reservation";
+}
+
+<h2>Edit Reservation (Admin / Staff)</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ReservationId" />
+
+            <!-- Sitting -->
+            <div class="mb-3">
+                <label asp-for="SittingId" class="form-label"></label>
+                <select asp-for="SittingId" class="form-select"
+                        asp-items="ViewBag.SittingId"></select>
+                <span asp-validation-for="SittingId" class="text-danger"></span>
+            </div>
+
+            <!-- Guest details -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="FirstName" class="form-label"></label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="LastName" class="form-label"></label>
+                        <input asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Phone" class="form-label"></label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="ReservationSource" class="form-label"></label>
+                        <select asp-for="ReservationSource" class="form-select">
+                            <option>Online</option>
+                            <option>Mobile</option>
+                            <option>Phone</option>
+                            <option>Email</option>
+                            <option>In-person</option>
+                        </select>
+                        <span asp-validation-for="ReservationSource" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time & guests -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label asp-for="StartTime" class="form-label"></label>
+                        <input asp-for="StartTime" type="datetime-local" class="form-control" />
+                        <span asp-validation-for="StartTime" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label asp-for="Duration" class="form-label"></label>
+                        <input asp-for="Duration" class="form-control" />
+                        <span asp-validation-for="Duration" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label asp-for="NumOfGuests" class="form-label"></label>
+                        <input asp-for="NumOfGuests" class="form-control" />
+                        <span asp-validation-for="NumOfGuests" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW: Status dropdown -->
+            <div class="mb-3">
+                <label asp-for="Status" class="form-label">Status</label>
+                <select asp-for="Status" class="form-select">
+                    <option value="Pending">Pending</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Seated">Seated</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <!-- Notes -->
+            <div class="mb-3">
+                <label asp-for="Notes" class="form-label"></label>
+                <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+
+            <!-- NEW: Table section (same as create, not yet wired to DB) -->
+            <div class="mb-3">
+                <label asp-for="TableNumber" class="form-label">Table(s)</label>
+                <input asp-for="TableNumber" class="form-control" placeholder="e.g. M1 or B2, B3" />
+                <span asp-validation-for="TableNumber" class="text-danger"></span>
+            </div>
+
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,47 +1,103 @@
 ﻿@model IEnumerable<BeanScene.Web.Models.RestaurantTable>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Restaurant Floor Plan";
+
+    var balcony = Model.Where(t => t.TableName.StartsWith("B")).ToList();
+    var main = Model.Where(t => t.TableName.StartsWith("M")).ToList();
+    var outside = Model.Where(t => t.TableName.StartsWith("O")).ToList();
 }
 
-<h1>Index</h1>
+<style>
+    .floor-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        align-items: center;
+    }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.TableName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Seats)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Area)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.TableName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Seats)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Area.AreaId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.RestaurantTableId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.RestaurantTableId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.RestaurantTableId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    .area-label {
+        width: 80px;
+        font-weight: bold;
+    }
+
+    .table-node {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 0.75rem;
+    }
+
+    .table-dot {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 4px;
+        box-shadow: 0 0 4px rgba(0,0,0,.15);
+        font-weight: 600;
+    }
+
+    .table-dot-available {
+        background-color: #e8f5e9; /* greenish */
+        border: 2px solid #198754;
+        color: #155724;
+    }
+
+    .table-dot-booked {
+        background-color: #f8d7da; /* reddish */
+        border: 2px solid #8b1d1d;
+        color: #8b1d1d;
+    }
+
+    .legend {
+        margin-bottom: 16px;
+        font-size: 0.9rem;
+    }
+</style>
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="legend">
+    <span class="table-dot table-dot-available"
+          style="display:inline-flex;width:18px;height:18px;margin-right:6px;"></span>
+    Green = available&nbsp;&nbsp;&nbsp;
+    <span class="table-dot table-dot-booked"
+          style="display:inline-flex;width:18px;height:18px;margin-right:6px;"></span>
+    Red = booked
+</div>
+
+<div class="floor-row">
+    <div class="area-label">Balcony</div>
+    @foreach (var t in balcony)
+    {
+        var dotClass = "table-dot " + (t.IsBooked ? "table-dot-booked" : "table-dot-available");
+        <div class="table-node">
+            <div class="@dotClass">@t.TableName</div>
+        </div>
+    }
+</div>
+
+<div class="floor-row">
+    <div class="area-label">Main</div>
+    @foreach (var t in main)
+    {
+        var dotClass = "table-dot " + (t.IsBooked ? "table-dot-booked" : "table-dot-available");
+        <div class="table-node">
+            <div class="@dotClass">@t.TableName</div>
+        </div>
+    }
+</div>
+
+<div class="floor-row">
+    <div class="area-label">Outside</div>
+    @foreach (var t in outside)
+    {
+        var dotClass = "table-dot " + (t.IsBooked ? "table-dot-booked" : "table-dot-available");
+        <div class="table-node">
+            <div class="@dotClass">@t.TableName</div>
+        </div>
+    }
+</div>

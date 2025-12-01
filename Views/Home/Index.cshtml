@@ -1,18 +1,90 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <img src="~/images/logo.png"
-         alt="Bean Scene logo"
-         class="img-fluid my-4"
-         style="max-width: 300px;" />
+<div class="hero-wrapper">
+    <div class="hero-overlay">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <!-- Text -->
+                <div class="col-md-6 text-light mb-4 mb-md-0">
+                    <p class="hero-badge">Welcome to</p>
+                    <h1 class="display-4 fw-bold mb-3">
+                        BeanScene Restaurant
+                    </h1>
+                    <p class="lead mb-4">
+                        Reserve your perfect table in our Main Hall, Balcony, or Outside area.
+                        Fresh food, warm lighting, and a relaxed atmosphere – all ready for you.
+                    </p>
 
-    <h1 class="display-4">Welcome to Bean Scene</h1>
-    <p>
-        Learn about
-        <a href="https://learn.microsoft.com/aspnet/core">
-            building Web apps with ASP.NET Core
-        </a>.
-    </p>
+                    <!-- Removed Book a Table button -->
+
+                    <div class="mt-4 hero-tags">
+                        <span class="badge bg-light text-dark me-2 mb-2">Breakfast • Lunch • Dinner</span>
+                        <span class="badge bg-light text-dark me-2 mb-2">Online Reservations</span>
+                        <span class="badge bg-light text-dark mb-2">Family • Friends • Events</span>
+                    </div>
+                </div>
+
+                <!-- Logo / Image -->
+                <div class="col-md-6 text-center">
+                    <div class="hero-image-card">
+                        <img src="~/images/logo.png"
+                             alt="BeanScene Restaurant"
+                             class="img-fluid hero-logo" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sections below hero -->
+<div class="container my-5">
+    <div class="row text-center g-4">
+        <div class="col-md-4">
+            <div class="info-card h-100">
+                <div class="info-icon">🏠</div>
+                <h4>Main Dining Area</h4>
+                <p>
+                    Cosy indoor seating with full service and warm ambient lighting.
+                    Ideal for families, groups, and casual dining.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="info-card h-100">
+                <div class="info-icon">🌿</div>
+                <h4>Outside Area</h4>
+                <p>
+                    Fresh air, relaxed seating and a laid-back vibe.
+                    Perfect for sunny days and chilled catch-ups.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="info-card h-100">
+                <div class="info-icon">🌇</div>
+                <h4>Balcony</h4>
+                <p>
+                    Elevated views with a quieter atmosphere.
+                    Great for date nights and small celebrations.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5" />
+
+    <div class="row justify-content-center text-center">
+        <div class="col-md-8">
+            <h3 class="mb-3">How reservations work</h3>
+            <p class="text-muted">
+                Choose your sitting time, share your guest details, and add any special requests like “window seat”
+                or “highchair required”. Our staff confirm your booking and get everything ready before you arrive.
+            </p>
+        </div>
+    </div>
 </div>

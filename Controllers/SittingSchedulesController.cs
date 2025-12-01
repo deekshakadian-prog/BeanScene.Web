@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BeanScene.Web.Data;
 using BeanScene.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BeanScene.Web.Controllers
 {
+    [Authorize(Roles = "Admin,Staff")]
     public class SittingSchedulesController : Controller
     {
         private readonly BeanSceneContext _context;

@@ -1,0 +1,31 @@
+﻿@model IEnumerable<BeanScene.Web.Models.Reservation>
+
+@{
+    ViewData["Title"] = "My Reservations";
+}
+
+<h1 class="mb-4">My Reservations</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Sitting</th>
+            <th>Start time</th>
+            <th>Guests</th>
+            <th>Status</th>
+            <th>Table</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Sitting?.Stype</td>
+            <td>@item.StartTime</td>
+            <td>@item.NumOfGuests</td>
+            <td>@item.Status</td>
+            <td>@item.TableNumber</td>  @* 👈 now shows B1 / M2 / etc *@
+        </tr>
+    }
+    </tbody>
+</table>

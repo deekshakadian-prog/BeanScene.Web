@@ -1,0 +1,47 @@
+﻿@model IEnumerable<BeanScene.Web.Models.Reservation>
+
+@{
+    ViewData["Title"] = "Reservations (Admin / Staff)";
+}
+
+<h2>Reservations (Admin / Staff)</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Reservation</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Guest</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Sitting</th>
+            <th>Start Time</th>
+            <th>Guests</th>
+            <th>Status</th>
+            <th>Table(s)</th>  @* 👈 NEW COLUMN *@
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.FirstName @item.LastName</td>
+                <td>@item.Email</td>
+                <td>@item.Phone</td>
+                <td>@item.Sitting?.Stype</td>
+                <td>@item.StartTime.ToString("g")</td>
+                <td>@item.NumOfGuests</td>
+                <td>@item.Status</td>
+                <td>@item.TableNumber</td>  @* 👈 DISPLAY TABLE NUMBER *@
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ReservationId" class="btn btn-sm btn-secondary">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.ReservationId" class="btn btn-sm btn-info">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.ReservationId" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

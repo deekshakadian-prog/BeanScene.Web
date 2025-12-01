@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using BeanScene.Web.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using BeanScene.Web.Data;
 
 namespace BeanScene.Web.Controllers
 {
@@ -11,8 +15,9 @@ namespace BeanScene.Web.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AdminController(UserManager<ApplicationUser> userManager,
-                               RoleManager<IdentityRole> roleManager)
+        public AdminController(
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -40,14 +45,21 @@ namespace BeanScene.Web.Controllers
 
         // ✅ Handle role assignment POST request
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignRole(string userId, string role)
         {
             if (!await _roleManager.RoleExistsAsync(role))
-                return BadRequest("Role does not exist.");
+            {
+                TempData["Error"] = "Role does not exist.";
+                return RedirectToAction(nameof(Users));
+            }
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
-                return NotFound();
+            {
+                TempData["Error"] = "User not found.";
+                return RedirectToAction(nameof(Users));
+            }
 
             // Remove all current roles before assigning the new one
             var currentRoles = await _userManager.GetRolesAsync(user);
@@ -59,6 +71,41 @@ namespace BeanScene.Web.Controllers
                 TempData["Error"] = string.Join("; ", result.Errors.Select(e => e.Description));
             else
                 TempData["Message"] = $"Role '{role}' assigned to {user.Email}";
+
+            return RedirectToAction(nameof(Users));
+        }
+
+        // ✅ NEW: Delete user
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "Invalid user id.";
+                return RedirectToAction(nameof(Users));
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                TempData["Error"] = "User not found.";
+                return RedirectToAction(nameof(Users));
+            }
+
+            // Optional: prevent deleting yourself
+            if (user.UserName == User.Identity?.Name)
+            {
+                TempData["Error"] = "You cannot delete your own admin account.";
+                return RedirectToAction(nameof(Users));
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+                TempData["Error"] = string.Join("; ", result.Errors.Select(e => e.Description));
+            else
+                TempData["Message"] = $"User '{user.Email ?? user.UserName}' deleted.";
 
             return RedirectToAction(nameof(Users));
         }

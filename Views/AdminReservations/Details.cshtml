@@ -1,0 +1,49 @@
+﻿@model BeanScene.Web.Models.Reservation
+
+@{
+    ViewData["Title"] = "Reservation Details";
+}
+
+<h2>Reservation Details</h2>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Guest</dt>
+        <dd class="col-sm-9">@Model.FirstName @Model.LastName</dd>
+
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
+
+        <dt class="col-sm-3">Phone</dt>
+        <dd class="col-sm-9">@Model.Phone</dd>
+
+        <dt class="col-sm-3">Sitting</dt>
+        <dd class="col-sm-9">@Model.Sitting?.Stype</dd>
+
+        <dt class="col-sm-3">Start Time</dt>
+        <dd class="col-sm-9">@Model.StartTime.ToString("f")</dd>
+
+        <dt class="col-sm-3">Duration (min)</dt>
+        <dd class="col-sm-9">@Model.Duration</dd>
+
+        <dt class="col-sm-3">Guests</dt>
+        <dd class="col-sm-9">@Model.NumOfGuests</dd>
+
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">@Model.Status</dd>
+
+        <dt class="col-sm-3">Table(s)</dt>
+        <dd class="col-sm-9">@Model.TableNumber</dd>   @* 👈 HERE *@
+
+        <dt class="col-sm-3">Notes</dt>
+        <dd class="col-sm-9">@Model.Notes</dd>
+
+        <dt class="col-sm-3">Created At</dt>
+        <dd class="col-sm-9">@Model.CreatedAt.ToString("g")</dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.ReservationId" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
+</div>

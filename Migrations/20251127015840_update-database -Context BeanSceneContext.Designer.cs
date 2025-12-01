@@ -4,6 +4,7 @@ using BeanScene.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeanScene.Web.Migrations
 {
     [DbContext(typeof(BeanSceneContext))]
-    partial class BeanSceneContextModelSnapshot : ModelSnapshot
+    [Migration("20251127015840_update-database -Context BeanSceneContext")]
+    partial class updatedatabaseContextBeanSceneContext
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,10 +116,6 @@ namespace BeanScene.Web.Migrations
                         .HasMaxLength(20)
                         .IsUnicode(false)
                         .HasColumnType("varchar(20)");
-
-                    b.Property<string>("TableNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("ReservationId")
                         .HasName("PK__Reservat__B7EE5F0404326B6B");
