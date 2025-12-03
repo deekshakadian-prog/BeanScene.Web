@@ -1,11 +1,15 @@
 ﻿using BeanScene.Web.Data;
 using BeanScene.Web.Models;
 using BeanScene.Web.Services;
+using BeanScene.Web.Hubs;          // 👈 ADD THIS LINE
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ---------------- SIGNALR (CHAT) ------------------
+builder.Services.AddSignalR();
 
 // ---------------- CONNECTION STRING ----------------
 var cs = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -71,11 +75,14 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
+// ---------------- SIGNALR HUB ROUTE ---------------
+app.MapHub<ChatHub>("/chathub");   // 👈 THIS IS THE CHAT ENDPOINT
+
 // ---------------- SEED IDENTITY + TABLE DATA ------
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    
+
     // Seed roles/admin user
     await SeedIdentity.EnsureSeededAsync(services);
 
